@@ -1,16 +1,11 @@
-# ngiritlah
-
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+<h1>Ngiritlah</h1>
+<p>Aplikasi untuk pencatatan pengeluaran</p>
+<p>Feature : </p>
+<ul>
+  <li>Register</li>
+  <li>Tambah Kategori Pengeluaran</li>
+  <li>Tambah Transaksi Pengeluaran</li>
+  <li>Notifikasi Pengingat</li>
+  <li>Laporan</li>
+</ul>
+<p>Database : <b>sqflite</b></p>  
