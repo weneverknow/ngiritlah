@@ -195,7 +195,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text("${e.keterangan}"),
+                                      Text(
+                                        "${e.keterangan}",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w300),
+                                      ),
                                       Text(
                                         NumberFormat.currency(
                                           locale: 'id_IDR',

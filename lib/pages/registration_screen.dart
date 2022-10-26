@@ -25,22 +25,27 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _salaryController =
       MoneyMaskedTextController(precision: 0, decimalSeparator: '');
 
+  String _salary = "";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-          child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+          child: ListView(
+        //crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            margin: const EdgeInsets.fromLTRB(
-                0, defaultPadding * 2, defaultPadding, defaultPadding / 4),
-            width: 180,
-            height: 140,
-            decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage("assets/images/teller.jpg"),
-                    fit: BoxFit.contain)),
+          Align(
+            alignment: Alignment.topLeft,
+            child: Container(
+              margin: const EdgeInsets.fromLTRB(
+                  0, defaultPadding * 2, defaultPadding, defaultPadding / 4),
+              width: 180,
+              height: 140,
+              decoration: BoxDecoration(
+                  image: DecorationImage(
+                      image: AssetImage("assets/images/user.png"),
+                      fit: BoxFit.contain)),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(defaultPadding,
@@ -88,10 +93,15 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 isSalaryValid = state.validation.isSalaryValid ?? true;
               }
               return buildInput("Gaji Saat Ini",
-                  hintText: "8.000.000",
+                  hintText: "IDR 8.000.000",
                   textAlign: TextAlign.end,
                   textInputType: TextInputType.number,
-                  icon: Icons.monetization_on_outlined,
+                  icon: Icons.monetization_on_outlined, onChanged: (val) {
+                print(
+                    "onChanged ${int.tryParse(val?.replaceAll('.', '') ?? '0') ?? 0}");
+                _salary =
+                    "${int.tryParse(val?.replaceAll('.', '') ?? '0') ?? 0}";
+              },
                   controller: _salaryController,
                   errorText: isSalaryValid ? "" : "Gaji Saat Ini harus diisi");
             },
@@ -99,60 +109,49 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           const SizedBox(
             height: defaultPadding * 2,
           ),
-          Flexible(
-              child: ListView(
-            shrinkWrap: true,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
-                child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        primary: primaryColor,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        padding: const EdgeInsets.symmetric(vertical: 15)),
-                    onPressed: () async {
-                      print(double.tryParse(_salaryController.text) ?? 0);
-                      context.read<ValidationBloc>().add(CheckValidation(
-                          username: _nameController.text,
-                          salary:
-                              double.tryParse(_salaryController.text) ?? 0));
-                      final isvalid = await validation();
-
-                      if (isvalid) {
-                        await AppCache.saveAppStatus(
-                            "loggedin"); //save already logged in status to cache
-
-                        await UserDatabaseService
-                            .createTable(); //create user table
-                        await KategoriDatabaseService
-                            .createTable(); //create kategori table
-                        await TransaksiDatabaseService
-                            .createTable(); //create transaksi table
-
-                        await UserDatabaseService.insert(
-                            _nameController.text,
-                            double.tryParse(_salaryController.text) ??
-                                0); //insert user
-
-                        context.read<UserBloc>().add(LoadUser());
-                        context.read<KategoriBloc>().add(LoadKategori());
-
-                        Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (_) => HomeScreen()));
-                      }
-                    },
-                    child: Text("MASUK")),
-              )
-            ],
-          ))
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
+            child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    primary: primaryColor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    padding: const EdgeInsets.symmetric(vertical: 15)),
+                onPressed: login,
+                child: Text("MASUK")),
+          )
         ],
       )),
     );
   }
 
+  login() async {
+    print(double.tryParse(_salary) ?? 0);
+    context.read<ValidationBloc>().add(CheckValidation(
+        username: _nameController.text, salary: double.tryParse(_salary) ?? 0));
+    final isvalid = await validation();
+
+    if (isvalid) {
+      await AppCache.saveAppStatus(
+          "loggedin"); //save already logged in status to cache
+
+      await UserDatabaseService.createTable(); //create user table
+      await KategoriDatabaseService.createTable(); //create kategori table
+      await TransaksiDatabaseService.createTable(); //create transaksi table
+
+      await UserDatabaseService.insert(
+          _nameController.text, double.tryParse(_salary) ?? 0); //insert user
+
+      context.read<UserBloc>().add(LoadUser());
+      context.read<KategoriBloc>().add(LoadKategori());
+
+      Navigator.of(context)
+          .pushReplacement(MaterialPageRoute(builder: (_) => HomeScreen()));
+    }
+  }
+
   Future<bool> validation() async {
-    var salary = double.tryParse(_salaryController.text) ?? 0;
+    var salary = double.tryParse(_salary) ?? 0;
     bool isValid = !(_nameController.text.isEmpty || salary <= 0);
     return isValid;
   }
